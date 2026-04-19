@@ -16,12 +16,12 @@ Jiko House is a modular, role-based restaurant management system built with **PH
 ### Problems It Solves
 |Problem | Solution|
 |-----------|-----------|
-- |**Manual order errors** | Digitized customer & waiter workflows|
-- | **Slow kitchen communication** | Real-time Kitchen Display System (KDS)|
-- | **Inventory chaos** | Automated stock tracking with alerts|
-- | **Payment delays** | Multi-method checkout (Cash, Card, M-Pesa)|
-- | **No visibility** | Analytics dashboard with reports|
--  |**Customer inconvenience** | Online ordering & reservations|
+ |**Manual order errors** | Digitized customer & waiter workflows|
+ | **Slow kitchen communication** | Real-time Kitchen Display System (KDS)|
+ | **Inventory chaos** | Automated stock tracking with alerts|
+ | **Payment delays** | Multi-method checkout (Cash, Card, M-Pesa)|
+ | **No visibility** | Analytics dashboard with reports|
+   |**Customer inconvenience** | Online ordering & reservations|
 
 ### ✨ Key Features
 - 🔐 **Unified login** with 5 role-based dashboards
