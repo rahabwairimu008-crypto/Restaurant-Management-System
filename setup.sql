@@ -200,33 +200,13 @@ CREATE TABLE inventory (
 -- ============================================================
 
 -- ── USERS ─────────────────────────────────────────────────
--- Passwords are hashed with PHP password_hash($pass, PASSWORD_DEFAULT)
--- Plain text passwords shown in comments for your reference
--- To regenerate: php -r "echo password_hash('yourpassword', PASSWORD_DEFAULT);"
-
-INSERT INTO users (name, email, phone, password_hash, role, status) VALUES
--- admin123
-('Admin Njeri',    'admin@jikohouse.co.ke',   '+254700000001', '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin',    'active'),
--- waiter123
-('Amina Wanjiku',  'amina@jikohouse.co.ke',   '+254700000002', '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'waiter',   'active'),
--- waiter123
-('Brian Otieno',   'brian@jikohouse.co.ke',   '+254700000003', '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'waiter',   'active'),
--- kitchen123
-('Chef Kamau',     'kamau@jikohouse.co.ke',   '+254700000004', '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'chef',     'active'),
--- kitchen123
-('Zawadi Ali',     'zawadi@jikohouse.co.ke',  '+254700000005', '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'sous_chef','active'),
--- cashier123
-('Pendo Kariuki',  'pendo@jikohouse.co.ke',   '+254700000006', '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'cashier',  'active'),
--- customer123
-('Demo Customer',  'customer@jikohouse.co.ke','+254700000007', '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'customer', 'active');
-
--- NOTE: The hash above is the well-known bcrypt hash of 'password'
--- IMPORTANT: After importing, run this PHP snippet once to set real passwords:
+-- No default users. Register your own account via the login page.
+-- The first admin account must be created directly in phpMyAdmin:
 --
---   php reset_passwords.php
+--   INSERT INTO users (name, email, password_hash, role, status)
+--   VALUES ('Your Name', 'you@email.com', '<hash>', 'admin', 'active');
 --
--- OR manually update each user's hash using phpMyAdmin with:
---   UPDATE users SET password_hash = '$2y$12$...' WHERE email = '...';
+-- Generate a hash with: php -r "echo password_hash('yourpassword', PASSWORD_DEFAULT);"
 
 
 -- ── CATEGORIES ────────────────────────────────────────────

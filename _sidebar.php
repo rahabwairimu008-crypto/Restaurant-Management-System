@@ -4,11 +4,11 @@
 $activePage = $activePage ?? '';
 
 // Live badge counts
-$pendingOrders = 0; $lowStock = 0; $cartCount = 0;
+$pendingOrders = 0; $lowStockCount = 0; $cartCount = 0;
 try {
     $db = getDB();
     $pendingOrders = (int)$db->query("SELECT COUNT(*) FROM orders WHERE status='pending'")->fetchColumn();
-    $lowStock      = (int)$db->query("SELECT COUNT(*) FROM inventory WHERE quantity < min_threshold")->fetchColumn();
+    $lowStockCount = (int)$db->query("SELECT COUNT(*) FROM inventory WHERE quantity < min_threshold")->fetchColumn();
     $cartCount     = (int)$db->query("SELECT COUNT(*) FROM cart")->fetchColumn();
 } catch (Exception $e) {}
 ?>
@@ -34,7 +34,7 @@ try {
     <div class="sb-section">Management</div>
     <a href="inventory.php"  class="sb-item <?= $activePage==='inventory' ?'active':'' ?>">
       <span class="sb-icon">📦</span> Inventory
-      <?php if ($lowStock > 0): ?><span class="sb-badge red"><?= $lowStock ?></span><?php endif; ?>
+      <?php if ($lowStockCount > 0): ?><span class="sb-badge red"><?= $lowStockCount ?></span><?php endif; ?>
     </a>
     <a href="staff.php"    class="sb-item <?= $activePage==='staff'    ?'active':'' ?>"><span class="sb-icon">👤</span> Staff</a>
     <a href="payments.php" class="sb-item <?= $activePage==='payments' ?'active':'' ?>"><span class="sb-icon">💳</span> Payments</a>

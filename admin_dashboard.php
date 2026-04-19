@@ -24,7 +24,7 @@ function rows($pdo, $sql, $p = []) {
     try {
         $s = $pdo->prepare($sql);
         $s->execute($p);
-        return $s->fetchAll();
+        return $s->fetchAll(PDO::FETCH_ASSOC);
     } catch (Exception $e) { return []; }
 }
 
@@ -89,22 +89,23 @@ $recentOrders = rows($pdo,
      LIMIT 8");
 
 // ── Low stock ─────────────────────────────────────────────────────────────────
-// ── Low stock ────────────────────────────────────────────────────────────────
-$stmt = $pdo->query(
-    "SELECT name, quantity, min_threshold, unit
-     FROM inventory
-     WHERE min_threshold > 0
-     AND quantity < min_threshold
-     ORDER BY (quantity / NULLIF(min_threshold,0)) ASC
-     LIMIT 5"
-);
-
-$lowStock = $stmt->fetchAll(PDO::FETCH_ASSOC);
-if (!is_array($lowStock)) {
-    $lowStock = [];
+$lowStock      = [];
+$lowStockCount = 0;
+try {
+    $__ls = $pdo->query(
+        "SELECT name, quantity+0 as quantity, min_threshold+0 as min_threshold, unit
+         FROM inventory
+         WHERE min_threshold > 0 AND quantity < min_threshold
+         ORDER BY (quantity / NULLIF(min_threshold,0)) ASC
+         LIMIT 5"
+    );
+    $lowStock      = $__ls->fetchAll(PDO::FETCH_ASSOC);
+    $lowStockCount = is_array($lowStock) ? count($lowStock) : 0;
+    if (!is_array($lowStock)) $lowStock = [];
+} catch (Exception $e) {
+    $lowStock = []; $lowStockCount = 0;
 }
 
-$lowStockCount = count($lowStock);
 
 
 
@@ -387,42 +388,42 @@ $today = date('D, d M Y');
       </div>
 
      <!-- Low Stock Summary Card -->
-<!-- Low Stock Summary Card -->
 <div class="card">
   <div class="card-head">
     <span class="card-title">Low Stock Items</span>
     <a href="inventory.php" class="card-action">Manage →</a>
   </div>
-
+  <?php if ($lowStockCount > 0): ?>
+  <table>
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th>In Stock</th>
+        <th>Minimum</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <?php foreach ($lowStock as $ls):
+        $pct = $ls['min_threshold'] > 0 ? ($ls['quantity'] / $ls['min_threshold']) : 0;
+        $statusLabel = $pct <= 0 ? 'Out' : ($pct < 0.5 ? 'Critical' : 'Low');
+        $statusColor = $pct <= 0 ? '#c0392b' : ($pct < 0.5 ? '#e74c3c' : '#e67e22');
+      ?>
+      <tr>
+        <td style="font-weight:600;color:var(--deep)"><?= htmlspecialchars($ls['name']) ?></td>
+        <td class="mono" style="color:var(--red);font-weight:600"><?= (float)$ls['quantity'] ?> <?= htmlspecialchars($ls['unit']) ?></td>
+        <td class="mono muted"><?= (float)$ls['min_threshold'] ?> <?= htmlspecialchars($ls['unit']) ?></td>
+        <td><span class="badge" style="background:<?= $statusColor ?>20;color:<?= $statusColor ?>;font-size:11px;font-weight:700"><?= $statusLabel ?></span></td>
+      </tr>
+      <?php endforeach; ?>
+    </tbody>
+  </table>
+  <?php else: ?>
   <div class="card-body">
-    <?php if (!empty($lowStock) && is_array($lowStock)): ?>
-      <table>
-        <thead>
-          <tr>
-            <th>Item</th>
-            <th>Remaining</th>
-            <th>Threshold</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php foreach ($lowStock as $ls): ?>
-          <tr>
-            <td><?= htmlspecialchars($ls['name']) ?></td>
-            <td><?= $ls['quantity'] . ' ' . htmlspecialchars($ls['unit']) ?></td>
-            <td><?= $ls['min_threshold'] . ' ' . htmlspecialchars($ls['unit']) ?></td>
-            <td class="stock-low">Low</td>
-          </tr>
-          <?php endforeach; ?>
-        </tbody>
-      </table>
-    <?php else: ?>
-      <p class="no-data">All items are sufficiently stocked.</p>
-    <?php endif; ?>
+    <p class="no-data">All items are sufficiently stocked.</p>
   </div>
+  <?php endif; ?>
 </div>
->
-
 
     </div><!-- /.grid-2 -->
 

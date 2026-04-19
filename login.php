@@ -24,13 +24,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submit'])) {
         $error = 'Please enter your email and password.';
 
     } else {
-        // Fetch user — must be active
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ? AND status = 'active' LIMIT 1");
-        $stmt->execute([$email]);
+        // Fetch user by email (case-insensitive)
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE LOWER(email) = ? LIMIT 1");
+        $stmt->execute([strtolower($email)]);
         $user = $stmt->fetch();
 
         if (!$user) {
-            $error = 'No active account found with that email.';
+            $error = 'No account found with that email address.';
+        } elseif ($user['status'] !== 'active') {
+            $error = 'This account is inactive. Please contact the administrator.';
 
         } elseif (!password_verify($password, $user['password_hash'])) {
             $error = 'Incorrect password. Please try again.';
@@ -52,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submit'])) {
                 case 'cashier':
                     header('Location: admin_dashboard.php'); break;
                 case 'waiter':
-                    header('Location: waiter_pos.php');      break;
+                    header('Location: Waiter_pos.php');      break;
                 case 'chef':
                 case 'sous_chef':
                     header('Location: kitchen_display.php'); break;
@@ -223,6 +225,12 @@ $roleOptions = [
   .demo-role  { font-size:10px; color:var(--dim); text-transform:uppercase; letter-spacing:.1em; }
   .demo-creds { font-size:12px; color:var(--muted); margin-top:3px; font-family:monospace; }
 
+  /* PASSWORD WRAPPER */
+  .pw-wrap       { position:relative; }
+  .pw-wrap input { padding-right: 42px; }
+  .pw-eye        { position:absolute; right:13px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:var(--dim); padding:0; line-height:1; font-size:17px; }
+  .pw-eye:hover  { color:var(--muted); }
+
   .switch-link { width:100%; background:transparent; border:1.5px solid var(--border); border-radius:11px; padding:11px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600; color:var(--muted); cursor:pointer; transition:all .2s; margin-top:10px; }
   .switch-link:hover { border-color:var(--gold); color:var(--goldlt); }
 
@@ -287,10 +295,19 @@ $roleOptions = [
             </div>
 
             <div class="role-opt">
-              <input type="radio" name="role" id="role-chef" value="chef" <?= (in_array($_POST['role']??'',['chef','sous_chef']))?'checked':'' ?>>
+              <input type="radio" name="role" id="role-chef" value="chef" <?= ($_POST['role']??'')==='chef'?'checked':'' ?>>
               <label for="role-chef">
                 <span class="role-icon">👨‍🍳</span>
                 <span class="role-name">Chef</span>
+                <span class="role-desc">Kitchen display</span>
+              </label>
+            </div>
+
+            <div class="role-opt">
+              <input type="radio" name="role" id="role-sous_chef" value="sous_chef" <?= ($_POST['role']??'')==='sous_chef'?'checked':'' ?>>
+              <label for="role-sous_chef">
+                <span class="role-icon">🧑‍🍳</span>
+                <span class="role-name">Sous Chef</span>
                 <span class="role-desc">Kitchen display</span>
               </label>
             </div>
@@ -319,34 +336,16 @@ $roleOptions = [
         </div>
         <div class="field">
           <label for="password">Password</label>
-          <input type="password" id="password" name="password"
-                 placeholder="••••••••"
-                 autocomplete="current-password" required>
+          <div class="pw-wrap">
+            <input type="password" id="password" name="password"
+                   placeholder="••••••••"
+                   autocomplete="current-password" required>
+            <button type="button" class="pw-eye" onclick="togglePw('password',this)" title="Show/hide password">👁</button>
+          </div>
         </div>
 
         <button type="submit" name="login_submit" class="submit-btn" id="sign-in-btn">Sign In →</button>
       </form>
-
-      <div class="or-line">staff demo logins — click to autofill</div>
-
-      <div class="demo-grid">
-        <div class="demo-item" onclick="fillDemo('admin@jikohouse.co.ke','admin123','admin')">
-          <div class="demo-role">👔 Admin</div>
-          <div class="demo-creds">admin / admin123</div>
-        </div>
-        <div class="demo-item" onclick="fillDemo('amina@jikohouse.co.ke','waiter123','waiter')">
-          <div class="demo-role">🍽 Waiter</div>
-          <div class="demo-creds">amina / waiter123</div>
-        </div>
-        <div class="demo-item" onclick="fillDemo('kamau@jikohouse.co.ke','kitchen123','chef')">
-          <div class="demo-role">👨‍🍳 Chef</div>
-          <div class="demo-creds">kamau / kitchen123</div>
-        </div>
-        <div class="demo-item" onclick="fillDemo('pendo@jikohouse.co.ke','cashier123','cashier')">
-          <div class="demo-role">💳 Cashier</div>
-          <div class="demo-creds">pendo / cashier123</div>
-        </div>
-      </div>
 
       <button type="button" class="switch-link" onclick="showTab('register')">
         New customer? Create an account →
@@ -376,11 +375,17 @@ $roleOptions = [
         <div class="row-2">
           <div class="field">
             <label>Password * (min 6)</label>
-            <input type="password" name="reg_password" placeholder="••••••••" required>
+            <div class="pw-wrap">
+              <input type="password" id="reg_password" name="reg_password" placeholder="••••••••" required>
+              <button type="button" class="pw-eye" onclick="togglePw('reg_password',this)" title="Show/hide password">👁</button>
+            </div>
           </div>
           <div class="field">
             <label>Confirm Password *</label>
-            <input type="password" name="reg_confirm" placeholder="••••••••" required>
+            <div class="pw-wrap">
+              <input type="password" id="reg_confirm" name="reg_confirm" placeholder="••••••••" required>
+              <button type="button" class="pw-eye" onclick="togglePw('reg_confirm',this)" title="Show/hide password">👁</button>
+            </div>
           </div>
         </div>
         <button type="submit" name="register_submit" class="submit-btn">Create Account →</button>
@@ -405,6 +410,15 @@ function showTab(tab) {
   document.getElementById('panel-register').classList.toggle('active', tab === 'register');
 }
 
+// Toggle password visibility
+function togglePw(fieldId, btn) {
+  const input = document.getElementById(fieldId);
+  if (!input) return;
+  const isHidden = input.type === 'password';
+  input.type = isHidden ? 'text' : 'password';
+  btn.textContent = isHidden ? '🙈' : '👁';
+}
+
 // Fill credentials AND select the matching role card
 function fillDemo(email, pass, role) {
   document.getElementById('email').value    = email;
@@ -421,11 +435,12 @@ document.querySelectorAll('input[name="role"]').forEach(r => {
 });
 function updateBtn(role) {
   const labels = {
-    admin:    'Sign In as Admin →',
-    cashier:  'Sign In as Cashier →',
-    waiter:   'Sign In as Waiter →',
-    chef:     'Sign In as Chef →',
-    customer: 'Sign In & Order Food →',
+    admin:     'Sign In as Admin →',
+    cashier:   'Sign In as Cashier →',
+    waiter:    'Sign In as Waiter →',
+    chef:      'Sign In as Chef →',
+    sous_chef: 'Sign In as Sous Chef →',
+    customer:  'Sign In & Order Food →',
   };
   document.getElementById('sign-in-btn').textContent = labels[role] || 'Sign In →';
 }
