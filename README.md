@@ -3,7 +3,7 @@ Jiko House — Restaurant Management System
 
 ---
 
-## 📌 Overview
+##  Overview
 This system is a modular restaurant and shop management application built with **PHP** and **MySQL**. It supports multiple user roles (Admin, Waiter, Chef, Cashier, Customer) and provides workflows for menu browsing, order placement, kitchen display, payments, and reporting.  
 
 **Problems It Solves:**
@@ -24,7 +24,7 @@ This system is a modular restaurant and shop management application built with *
 
 ---
 
-## ⚙️ System Requirements
+##  System Requirements
 | Requirement | Minimum |
 |-------------|----------|
 | PHP         | 7.4+ (8.x recommended) |
@@ -35,7 +35,7 @@ This system is a modular restaurant and shop management application built with *
 
 ---
 
-## 🚀 Installation & Setup
+##  Installation & Setup
 1. **Copy Files**  
    Place all project files inside your web server root (`htdocs/rms/` for InfinityFree or `htdocs/jiko/` locally).
 
@@ -66,7 +66,7 @@ This system is a modular restaurant and shop management application built with *
 
 ---
 
-## 🗄️ Database Schema
+## Database Schema
 The system uses 10 tables:
 - `users` — staff & customers with role separation  
 - `categories` — menu categories  
@@ -81,7 +81,7 @@ The system uses 10 tables:
 
 ---
 
-## 👥 User Roles
+##  User Roles
 | Role      | Redirects To         | Access |
 |-----------|----------------------|--------|
 | Customer  | `customer_menu.php`  | Menu, cart, checkout |
@@ -99,6 +99,7 @@ The system uses 10 tables:
 **Shops & Hubs** — track stock, sales, and customer accounts.
 
 **Event Catering Services** — handle reservations, billing, and staff coordination.
+
 -----
 ## Testing Workflow
 **Customer** → Register/login, browse menu, add to cart, checkout.
